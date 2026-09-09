@@ -13,8 +13,6 @@ function Products({
   search,
   setActivePage,
 }) {
-
-  // Calculate days remaining
   const getDaysLeft = (expiryDate) => {
     const today = new Date();
     const expiry = new Date(expiryDate);
@@ -29,8 +27,6 @@ function Products({
     );
   };
 
-
-  // Convert days into readable text
   const getDaysText = (expiryDate) => {
     const days = getDaysLeft(expiryDate);
 
@@ -49,22 +45,17 @@ function Products({
     return `${days} days`;
   };
 
-
-  // Filter products using search
   const filteredProducts = products.filter((product) =>
     product.name
       .toLowerCase()
       .includes(search.toLowerCase())
   );
 
-
   return (
-    <div className="page-content">
+    <div className="page-content products-page">
 
-      {/* PAGE HEADER */}
-
+      {/* HEADER */}
       <div className="products-page-header">
-
         <div>
           <span className="dashboard-eyebrow">
             INVENTORY MANAGEMENT
@@ -77,7 +68,6 @@ function Products({
           </p>
         </div>
 
-
         <button
           className="primary-btn"
           onClick={() => setActivePage("Add Product")}
@@ -85,15 +75,12 @@ function Products({
           <PlusCircle size={18} />
           Add Product
         </button>
-
       </div>
 
 
-      {/* PRODUCT COUNT */}
-
+      {/* SUMMARY */}
       <div className="products-summary">
-
-        <Package size={19} />
+        <Package size={18} />
 
         <span>
           {products.length}{" "}
@@ -102,18 +89,16 @@ function Products({
             : "products"}{" "}
           in your inventory
         </span>
-
       </div>
 
 
       {/* EMPTY STATE */}
-
       {filteredProducts.length === 0 ? (
 
         <div className="empty-state products-empty">
 
           <div className="empty-icon">
-            <Package size={28} />
+            <Package size={30} />
           </div>
 
           <h3>
@@ -128,108 +113,84 @@ function Products({
               : "Try searching for another product."}
           </p>
 
-
           {products.length === 0 && (
-
             <button
               className="primary-btn"
-              onClick={() =>
-                setActivePage("Add Product")
-              }
+              onClick={() => setActivePage("Add Product")}
             >
               <PlusCircle size={18} />
               Add Your First Product
             </button>
-
           )}
 
         </div>
 
       ) : (
 
-        /* PRODUCTS TABLE */
-
         <div className="products-table-card">
 
-          {/* TABLE HEADER */}
-
+          {/* TABLE HEADERS */}
           <div className="products-table-header">
-
-            <span>PRODUCT</span>
-            <span>CATEGORY</span>
-            <span>EXPIRY DATE</span>
-            <span>DAYS LEFT</span>
-            <span>STATUS</span>
-            <span>ACTION</span>
-
+            <div>PRODUCT</div>
+            <div>CATEGORY</div>
+            <div>EXPIRY DATE</div>
+            <div>DAYS LEFT</div>
+            <div>STATUS</div>
+            <div>ACTION</div>
           </div>
 
 
-          {/* TABLE ROWS */}
-
+          {/* PRODUCTS */}
           {filteredProducts.map((product) => {
 
-            const status = getStatus(
-              product.expiryDate
-            );
+            const status = getStatus(product.expiryDate);
 
             const daysLeft = getDaysLeft(
               product.expiryDate
             );
 
-            let statusClass = "";
+            let statusClass = "safe";
 
-            if (status === "Safe") {
-              statusClass = "safe";
-            } else if (
-              status === "Expiring Soon"
-            ) {
+            if (status === "Expiring Soon") {
               statusClass = "expiring-soon";
-            } else {
+            }
+
+            if (status === "Expired") {
               statusClass = "expired";
             }
 
-
             return (
-
               <div
                 className="products-table-row"
                 key={product.id}
               >
 
-                {/* PRODUCT NAME */}
-
+                {/* PRODUCT */}
                 <div className="table-product-name">
 
                   <div className="table-product-icon">
                     <Package size={18} />
                   </div>
 
-                  <div>
-
-                    <strong>
-                      {product.name}
-                    </strong>
+                  <div className="product-info">
+                    <strong>{product.name}</strong>
 
                     <small>
                       Qty: {product.quantity}
                     </small>
-
                   </div>
 
                 </div>
 
 
                 {/* CATEGORY */}
-
-                <span className="table-category">
+                <div className="table-category">
                   {product.category}
-                </span>
+                </div>
 
 
                 {/* EXPIRY DATE */}
-
-                <span className="table-expiry-date">
+                <div className="table-expiry-date">
 
                   <CalendarDays size={15} />
 
@@ -244,12 +205,11 @@ function Products({
                     }
                   )}
 
-                </span>
+                </div>
 
 
                 {/* DAYS LEFT */}
-
-                <span
+                <div
                   className={`table-days ${
                     daysLeft < 0
                       ? "expired-days"
@@ -258,41 +218,34 @@ function Products({
                       : "safe-days"
                   }`}
                 >
-                  {getDaysText(
-                    product.expiryDate
-                  )}
-                </span>
+                  {getDaysText(product.expiryDate)}
+                </div>
 
 
                 {/* STATUS */}
-
-                <span
-                  className={`status ${statusClass}`}
-                >
-                  {status}
-                </span>
+                <div>
+                  <span className={`status ${statusClass}`}>
+                    {status}
+                  </span>
+                </div>
 
 
                 {/* DELETE */}
-
-                <button
-                  className="delete-btn"
-                  onClick={() =>
-                    deleteProduct(product.id)
-                  }
-                  title="Delete Product"
-                >
-                  <Trash2 size={17} />
-                </button>
+                <div>
+                  <button
+                    className="delete-btn"
+                    onClick={() => deleteProduct(product.id)}
+                    title="Delete Product"
+                  >
+                    <Trash2 size={17} />
+                  </button>
+                </div>
 
               </div>
-
             );
-
           })}
 
         </div>
-
       )}
 
     </div>
