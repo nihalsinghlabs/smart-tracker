@@ -1,3 +1,4 @@
+
 import {
   LayoutDashboard,
   PlusCircle,
@@ -5,6 +6,7 @@ import {
   Bell,
   Settings,
   ChevronDown,
+  ScanText,
 } from "lucide-react";
 
 function Sidebar({ activePage, setActivePage, alertCount }) {
@@ -12,12 +14,12 @@ function Sidebar({ activePage, setActivePage, alertCount }) {
     { name: "Dashboard", icon: LayoutDashboard },
     { name: "Add Product", icon: PlusCircle },
     { name: "Products", icon: Package },
+    { name: "Receipt Scanner", icon: ScanText },
     { name: "Alerts", icon: Bell },
   ];
 
   return (
     <aside className="sidebar">
-      {/* Logo */}
       <div className="logo">
         <div className="logo-icon">
           <Package size={21} />
@@ -29,7 +31,6 @@ function Sidebar({ activePage, setActivePage, alertCount }) {
         </div>
       </div>
 
-      {/* Navigation */}
       <nav className="nav-menu">
         <p className="menu-title">WORKSPACE</p>
 
@@ -56,7 +57,6 @@ function Sidebar({ activePage, setActivePage, alertCount }) {
         })}
       </nav>
 
-      {/* Bottom */}
       <div className="sidebar-bottom">
         <button className="nav-item">
           <Settings size={19} />
