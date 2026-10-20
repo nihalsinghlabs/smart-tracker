@@ -11,55 +11,85 @@ import Alerts from "./pages/Alerts";
 import ReceiptScanner from "./pages/ReceiptScanner";
 
 import { getStatus } from "./utils/expiryUtils";
-
 import "./App.css";
 
+const STORAGE_KEY = "smartTrackerProducts";
+
+function normalizeProduct(product) {
+  const hasExpiryDate =
+    typeof product.expiryDate === "string" &&
+    product.expiryDate.trim() !== "";
+
+  const validSources = ["verified", "estimated", "unknown"];
+
+  // Preserve known source information. Do not assume an old date
+  // was verified when its original source was never recorded.
+  const expirySource = validSources.includes(product.expirySource)
+    ? product.expirySource
+    : "unknown";
+
+  return {
+    ...product,
+    expiryDate: hasExpiryDate ? product.expiryDate : "",
+    expirySource,
+    expiryEvidence:
+      typeof product.expiryEvidence === "string"
+        ? product.expiryEvidence
+        : hasExpiryDate
+          ? "Previously saved expiry date; original source was not recorded."
+          : "No expiry date has been confirmed.",
+  };
+}
+
+function loadProducts() {
+  try {
+    const savedProducts = localStorage.getItem(STORAGE_KEY);
+
+    if (!savedProducts) return [];
+
+    const parsedProducts = JSON.parse(savedProducts);
+
+    if (!Array.isArray(parsedProducts)) return [];
+
+    return parsedProducts.map(normalizeProduct);
+  } catch (error) {
+    console.error("Error loading products:", error);
+    return [];
+  }
+}
 
 function App() {
   const [activePage, setActivePage] = useState("Dashboard");
-
-  const [products, setProducts] = useState(() => {
-    try {
-      const savedProducts = localStorage.getItem("smartTrackerProducts");
-      return savedProducts ? JSON.parse(savedProducts) : [];
-    } catch (error) {
-      console.error("Error loading products:", error);
-      return [];
-    }
-  });
-
+  const [products, setProducts] = useState(loadProducts);
   const [search, setSearch] = useState("");
 
-  // Save products to LocalStorage whenever they change
   useEffect(() => {
-    localStorage.setItem(
-      "smartTrackerProducts",
-      JSON.stringify(products)
-    );
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+    } catch (error) {
+      console.error("Error saving products:", error);
+    }
   }, [products]);
 
-
-  // Count products requiring attention
   const alertCount = products.filter((product) => {
     const status = getStatus(product.expiryDate);
-
     return status === "Expiring Soon" || status === "Expired";
   }).length;
 
-  // Add a single product
   const addProduct = (product) => {
     setProducts((previousProducts) => [
       ...previousProducts,
-      product,
+      normalizeProduct(product),
     ]);
   };
 
-  // Import multiple products from the receipt scanner
   const importProducts = (importedProducts) => {
-    const productsWithIds = importedProducts.map((product) => ({
-      ...product,
-      id: crypto.randomUUID(),
-    }));
+    const productsWithIds = importedProducts.map((product) =>
+      normalizeProduct({
+        ...product,
+        id: crypto.randomUUID(),
+      })
+    );
 
     setProducts((previousProducts) => [
       ...previousProducts,
@@ -69,7 +99,6 @@ function App() {
     setActivePage("Products");
   };
 
-  // Delete a product
   const deleteProduct = (id) => {
     setProducts((previousProducts) =>
       previousProducts.filter((product) => product.id !== id)
