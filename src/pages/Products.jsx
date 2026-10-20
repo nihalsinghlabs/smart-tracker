@@ -5,7 +5,7 @@ import {
   CalendarDays,
 } from "lucide-react";
 
-import { getStatus } from "../utils/expiryUtils";
+import { getStatus, getDaysRemaining, formatDate } from "../utils/expiryUtils";
 
 function Products({
   products,
@@ -13,35 +13,12 @@ function Products({
   search,
   setActivePage,
 }) {
-  const getDaysLeft = (expiryDate) => {
-    const today = new Date();
-    const expiry = new Date(expiryDate);
-
-    today.setHours(0, 0, 0, 0);
-    expiry.setHours(0, 0, 0, 0);
-
-    const difference = expiry - today;
-
-    return Math.ceil(
-      difference / (1000 * 60 * 60 * 24)
-    );
-  };
-
   const getDaysText = (expiryDate) => {
-    const days = getDaysLeft(expiryDate);
-
-    if (days < 0) {
-      return `${Math.abs(days)} days ago`;
-    }
-
-    if (days === 0) {
-      return "Today";
-    }
-
-    if (days === 1) {
-      return "1 day";
-    }
-
+    const days = getDaysRemaining(expiryDate);
+    if (days === null) return "Unknown";
+    if (days < 0) return `${Math.abs(days)} ${Math.abs(days) === 1 ? "day" : "days"} ago`;
+    if (days === 0) return "Today";
+    if (days === 1) return "1 day";
     return `${days} days`;
   };
 
@@ -145,19 +122,12 @@ function Products({
 
             const status = getStatus(product.expiryDate);
 
-            const daysLeft = getDaysLeft(
-              product.expiryDate
-            );
+            const daysLeft = getDaysRemaining(product.expiryDate);
 
             let statusClass = "safe";
-
-            if (status === "Expiring Soon") {
-              statusClass = "expiring-soon";
-            }
-
-            if (status === "Expired") {
-              statusClass = "expired";
-            }
+            if (status === "Expiring Soon") statusClass = "expiring-soon";
+            if (status === "Expired") statusClass = "expired";
+            if (status === "Unknown") statusClass = "unknown";
 
             return (
               <div
@@ -178,6 +148,9 @@ function Products({
                     <small>
                       Qty: {product.quantity}
                     </small>
+                    {product.expirySource === "estimated" && product.expiryDate && (
+                      <span className="ai-estimate-label">AI ESTIMATE · UNVERIFIED</span>
+                    )}
                   </div>
 
                 </div>
@@ -194,16 +167,7 @@ function Products({
 
                   <CalendarDays size={15} />
 
-                  {new Date(
-                    product.expiryDate
-                  ).toLocaleDateString(
-                    "en-US",
-                    {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    }
-                  )}
+                  {formatDate(product.expiryDate)}
 
                 </div>
 
@@ -211,11 +175,13 @@ function Products({
                 {/* DAYS LEFT */}
                 <div
                   className={`table-days ${
-                    daysLeft < 0
-                      ? "expired-days"
-                      : daysLeft <= 7
-                      ? "warning-days"
-                      : "safe-days"
+                    daysLeft === null
+                      ? "unknown-days"
+                      : daysLeft < 0
+                        ? "expired-days"
+                        : daysLeft <= 7
+                          ? "warning-days"
+                          : "safe-days"
                   }`}
                 >
                   {getDaysText(product.expiryDate)}
@@ -247,6 +213,13 @@ function Products({
 
         </div>
       )}
+
+      <aside className="expiry-disclaimer" role="note">
+        <div>
+          <strong>AI expiry disclaimer</strong>
+          <p>AI-generated expiry dates are estimates, not verified expiry dates. Always check the product packaging for the actual expiry date. For medicines, follow the printed expiry date or consult a pharmacist.</p>
+        </div>
+      </aside>
 
     </div>
     
