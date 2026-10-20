@@ -166,6 +166,7 @@ function App() {
         <Topbar
           search={search}
           setSearch={setSearch}
+          setActivePage={setActivePage}
           alertCount={alertCount}
         />
 
