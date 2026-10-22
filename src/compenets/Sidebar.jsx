@@ -1,10 +1,9 @@
-
 import {
   LayoutDashboard,
   PlusCircle,
   Package,
   Bell,
-  Settings,
+  Settings as SettingsIcon,
   ChevronDown,
   ScanText,
 } from "lucide-react";
@@ -58,12 +57,18 @@ function Sidebar({ activePage, setActivePage, alertCount }) {
       </nav>
 
       <div className="sidebar-bottom">
-        <button className="nav-item">
-          <Settings size={19} />
+        <button
+          className={`nav-item ${activePage === "Settings" ? "active" : ""}`}
+          onClick={() => setActivePage("Settings")}
+        >
+          <SettingsIcon size={19} />
           <span>Settings</span>
         </button>
 
-        <div className="user-card">
+        <button
+          className="user-card user-card-button"
+          onClick={() => setActivePage("Settings")}
+        >
           <div className="avatar">N</div>
 
           <div>
@@ -72,7 +77,7 @@ function Sidebar({ activePage, setActivePage, alertCount }) {
           </div>
 
           <ChevronDown size={15} />
-        </div>
+        </button>
       </div>
     </aside>
   );

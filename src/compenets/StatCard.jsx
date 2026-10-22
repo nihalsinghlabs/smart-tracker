@@ -1,6 +1,15 @@
+import useTilt from "../utils/useTilt";
+
 function StatCard({ icon, label, value, description, type }) {
+  const tilt = useTilt(8);
+
   return (
-    <div className={`stat-card ${type}`}>
+    <div
+      ref={tilt.ref}
+      className={`stat-card ${type}`}
+      onPointerMove={tilt.onPointerMove}
+      onPointerLeave={tilt.onPointerLeave}
+    >
       <div className="stat-header">
         <div className="stat-icon">
           {icon}

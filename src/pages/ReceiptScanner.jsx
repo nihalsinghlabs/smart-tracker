@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createWorker } from "tesseract.js";
 import "./ReceiptScanner.css";
 
-const API_URL = "https://smart-tracker-api-pbpd.onrender.com";
+const API_URL = "http://localhost:5000";
 
 const today = () => {
   const date = new Date();

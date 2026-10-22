@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 import Sidebar from "./compenets/Sidebar";
 import Topbar from "./compenets/Topbar";
-
+import Settings from "./pages/Settings";
 import Dashboard from "./pages/Dashboard";
 import AddProduct from "./pages/AddProduct";
 import Products from "./pages/Products";
@@ -12,6 +12,8 @@ import ReceiptScanner from "./pages/ReceiptScanner";
 
 import { getStatus } from "./utils/expiryUtils";
 import "./App.css";
+import "./styles/theme.css";
+
 
 const STORAGE_KEY = "smartTrackerProducts";
 
@@ -62,6 +64,28 @@ function App() {
   const [activePage, setActivePage] = useState("Dashboard");
   const [products, setProducts] = useState(loadProducts);
   const [search, setSearch] = useState("");
+    const [theme, setTheme] = useState(
+    () => localStorage.getItem("smartTrackerTheme") || "light"
+  );
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("smartTrackerTheme", theme);
+  }, [theme]);
+
+  const toggleTheme = () =>
+    setTheme((current) => (current === "light" ? "dark" : "light"));
+
+  // Feed pointer position into CSS variables for the 3D background parallax.
+  useEffect(() => {
+    const onMove = (event) => {
+      const root = document.documentElement;
+      root.style.setProperty("--px", (event.clientX / window.innerWidth - 0.5).toFixed(3));
+      root.style.setProperty("--py", (event.clientY / window.innerHeight - 0.5).toFixed(3));
+    };
+    window.addEventListener("pointermove", onMove);
+    return () => window.removeEventListener("pointermove", onMove);
+  }, []);
 
   useEffect(() => {
     try {
@@ -141,7 +165,14 @@ function App() {
             setActivePage={setActivePage}
           />
         );
-
+      case "Settings":
+        return (
+          <Settings
+            theme={theme}
+            toggleTheme={toggleTheme}
+            products={products}
+          />
+        );
       case "Dashboard":
       default:
         return (
@@ -156,6 +187,14 @@ function App() {
 
   return (
     <div className="app-container">
+      <div className="scene" aria-hidden="true">
+        <div className="orb orb-a" />
+        <div className="orb orb-b" />
+        <div className="orb orb-c" />
+        <div className="glass-sphere" />
+        <div className="grid-floor" />
+      </div>
+
       <Sidebar
         activePage={activePage}
         setActivePage={setActivePage}
@@ -163,11 +202,13 @@ function App() {
       />
 
       <div className="main-content">
-        <Topbar
+                <Topbar
           search={search}
           setSearch={setSearch}
           setActivePage={setActivePage}
           alertCount={alertCount}
+          theme={theme}
+          toggleTheme={toggleTheme}
         />
 
         <main className="content-area">

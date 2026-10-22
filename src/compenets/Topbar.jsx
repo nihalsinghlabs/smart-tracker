@@ -1,11 +1,15 @@
-import { Search, Bell, User } from "lucide-react";
+import { Search, Bell, User, Sun, Moon } from "lucide-react";
 
 function Topbar({
   search,
   setSearch,
   setActivePage,
   alertCount,
+  theme,
+  toggleTheme,
 }) {
+  const isDark = theme === "dark";
+
   return (
     <header className="topbar">
       <div className="search-box">
@@ -27,8 +31,18 @@ function Topbar({
 
       <div className="topbar-right">
         <button
+          className="theme-toggle"
+          onClick={toggleTheme}
+          aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          title={isDark ? "Light mode" : "Dark mode"}
+        >
+          {isDark ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
+
+        <button
           className="notification-btn"
           onClick={() => setActivePage("Alerts")}
+          aria-label="Alerts"
         >
           <Bell size={20} />
 
@@ -37,9 +51,13 @@ function Topbar({
           )}
         </button>
 
-        <div className="profile-avatar">
+        <button
+          className="profile-avatar"
+          onClick={() => setActivePage("Settings")}
+          aria-label="Account settings"
+        >
           <User size={19} />
-        </div>
+        </button>
       </div>
     </header>
   );

@@ -1,0 +1,741 @@
+/* =========================================================
+   SMARTTRACKER — Apple-clean glass theme with 3D motion
+   Loaded after App.css, so these rules override it.
+   Delete the import in App.jsx to revert to the original look.
+========================================================= */
+
+:root {
+  --bg: #f5f5f7;
+  --text: #1d1d1f;
+  --muted: #6e6e73;
+  --line: rgba(0, 0, 0, 0.07);
+  --glass: rgba(255, 255, 255, 0.62);
+  --glass-strong: rgba(255, 255, 255, 0.82);
+  --accent: #0071e3;
+  --accent-2: #8e5cf7;
+  --accent-3: #ff375f;
+  --green: #30d158;
+  --amber: #ff9f0a;
+  --red: #ff453a;
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 30px rgba(0, 0, 0, 0.06);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.04), 0 24px 60px rgba(0, 40, 120, 0.14);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter",
+    "Segoe UI", Roboto, sans-serif;
+}
+
+html,
+body {
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- 3D SCENE (fixed background) ---------- */
+
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 800px at 85% -10%, #dbe9ff 0%, transparent 60%),
+    radial-gradient(900px 700px at -10% 110%, #f0e4ff 0%, transparent 55%),
+    var(--bg);
+  perspective: 1200px;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.55;
+  transform: translate3d(calc(var(--px, 0) * 40px), calc(var(--py, 0) * 40px), 0);
+  transition: transform 1.2s var(--ease);
+  animation: drift 22s ease-in-out infinite alternate;
+}
+.orb-a { width: 520px; height: 520px; top: -120px; right: 5%;
+  background: radial-gradient(circle, #7cb8ff, transparent 70%); }
+.orb-b { width: 460px; height: 460px; bottom: -140px; left: 8%;
+  background: radial-gradient(circle, #c7a3ff, transparent 70%);
+  animation-duration: 28s; }
+.orb-c { width: 300px; height: 300px; top: 40%; left: 45%;
+  background: radial-gradient(circle, #ffb3c7, transparent 70%);
+  animation-duration: 18s; opacity: 0.4; }
+
+/* Glass sphere that rotates in 3D */
+.glass-sphere {
+  position: absolute;
+  top: 12%;
+  right: 12%;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.1) 35%),
+    linear-gradient(140deg, rgba(0, 113, 227, 0.35), rgba(142, 92, 247, 0.25) 60%, rgba(255, 55, 95, 0.2));
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    inset -20px -24px 60px rgba(255, 255, 255, 0.6),
+    0 40px 80px rgba(0, 60, 160, 0.18);
+  backdrop-filter: blur(6px);
+  transform: translate3d(calc(var(--px, 0) * -30px), calc(var(--py, 0) * -30px), 0)
+    rotateX(calc(var(--py, 0) * 25deg)) rotateY(calc(var(--px, 0) * 25deg));
+  transition: transform 0.9s var(--ease);
+  animation: spin 26s linear infinite, bob 9s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+/* Perspective grid floor */
+.grid-floor {
+  position: absolute;
+  left: -50%;
+  right: -50%;
+  bottom: -10%;
+  height: 75%;
+  background-image:
+    linear-gradient(rgba(0, 113, 227, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 113, 227, 0.14) 1px, transparent 1px);
+  background-size: 64px 64px;
+  transform: rotateX(68deg);
+  transform-origin: 50% 100%;
+  -webkit-mask-image: linear-gradient(to top, #000 10%, transparent 75%);
+  mask-image: linear-gradient(to top, #000 10%, transparent 75%);
+  animation: gridMove 10s linear infinite;
+}
+
+@keyframes drift {
+  from { margin: 0 0 0 0; }
+  to { margin: 40px -30px 0 30px; }
+}
+@keyframes spin {
+  from { rotate: 0deg; }
+  to { rotate: 360deg; }
+}
+@keyframes bob {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: 26px; }
+}
+@keyframes gridMove {
+  from { background-position: 0 0; }
+  to { background-position: 0 64px; }
+}
+
+/* ---------- LAYOUT ---------- */
+
+.app-container {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  color: var(--text);
+}
+
+.main-content {
+  background: transparent;
+}
+
+/* ---------- SIDEBAR ---------- */
+
+.sidebar {
+  background: var(--glass);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border-right: 1px solid var(--line);
+}
+
+.logo-icon {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 113, 227, 0.3);
+}
+
+.logo-text h2 {
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.menu-title {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.nav-item {
+  border-radius: 12px;
+  transition: background 0.25s var(--ease), transform 0.25s var(--ease), color 0.25s;
+}
+.nav-item:hover {
+  background: rgba(0, 0, 0, 0.04);
+  transform: translateX(3px);
+}
+.nav-item.active {
+  background: #fff;
+  box-shadow: var(--shadow-soft);
+  color: var(--text);
+}
+
+.user-card {
+  border-radius: 16px;
+  background: var(--glass-strong);
+  box-shadow: var(--shadow-soft);
+}
+
+.avatar,
+.profile-avatar {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+}
+
+/* ---------- TOPBAR ---------- */
+
+.topbar {
+  background: rgba(245, 245, 247, 0.6);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.search-box {
+  background: rgba(118, 118, 128, 0.1);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  transition: background 0.3s, box-shadow 0.3s var(--ease);
+}
+.search-box:focus-within {
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+}
+
+.notification-btn,
+.profile-avatar {
+  transition: transform 0.3s var(--ease);
+}
+.notification-btn:hover { transform: scale(1.08); }
+
+/* ---------- TYPOGRAPHY ---------- */
+
+.page-title,
+.dashboard-header h1,
+.products-page-header h1 {
+  letter-spacing: -0.035em;
+  font-weight: 650;
+  background: linear-gradient(180deg, #1d1d1f 40%, #6e6e73);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.dashboard-eyebrow,
+.receipt-eyebrow,
+.small-label {
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ---------- GLASS CARDS ---------- */
+
+.stat-card,
+.products-card,
+.products-table-card,
+.form-card,
+.info-panel,
+.receipt-upload-card,
+.receipt-review-card,
+.receipt-raw-card,
+.empty-state {
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+/* 3D tilt + glare on stat cards */
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+  will-change: transform;
+}
+.stat-card:hover {
+  box-shadow: var(--shadow-lift);
+}
+.stat-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at var(--gx, 50%) var(--gy, 50%),
+    rgba(255, 255, 255, 0.55),
+    transparent 45%
+  );
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.stat-card:hover::after { opacity: 1; }
+
+.stat-card h2 {
+  font-size: 40px;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+}
+.stat-card p,
+.stat-label {
+  color: var(--muted);
+}
+
+.stat-icon {
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transform: translateZ(30px);
+}
+
+/* Entrance: each card rises in with a stagger */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(22px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+.stat-card,
+.products-card,
+.products-table-card,
+.form-card,
+.info-panel,
+.recent-section,
+.receipt-upload-card,
+.receipt-review-card {
+  animation: rise 0.8s var(--ease) both;
+}
+.stats-grid > :nth-child(1) { animation-delay: 0.05s; }
+.stats-grid > :nth-child(2) { animation-delay: 0.12s; }
+.stats-grid > :nth-child(3) { animation-delay: 0.19s; }
+.stats-grid > :nth-child(4) { animation-delay: 0.26s; }
+.recent-section { animation-delay: 0.3s; }
+
+/* ---------- TABLE / ROWS ---------- */
+
+.table-header {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid var(--line);
+}
+
+.product-row {
+  border-bottom: 1px solid var(--line);
+  transition: background 0.25s, transform 0.4s var(--ease);
+}
+.product-row:hover {
+  background: rgba(255, 255, 255, 0.7);
+  transform: translateX(4px);
+}
+
+.product-icon,
+.table-product-icon {
+  border-radius: 12px;
+  background: linear-gradient(135deg, #e8f2ff, #f1e8ff);
+  color: var(--accent);
+}
+
+/* ---------- BUTTONS ---------- */
+
+.primary-btn,
+.receipt-primary-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  border: none;
+  border-radius: 980px;
+  font-weight: 600;
+  box-shadow: 0 8px 22px rgba(0, 113, 227, 0.28);
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), filter 0.3s;
+}
+.primary-btn:hover,
+.receipt-primary-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 14px 30px rgba(0, 113, 227, 0.36);
+  filter: saturate(1.1);
+}
+.primary-btn:active,
+.receipt-primary-btn:active {
+  transform: scale(0.97);
+}
+
+.secondary-btn,
+.receipt-secondary-btn {
+  border-radius: 980px;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.3s var(--ease);
+}
+.secondary-btn:hover,
+.receipt-secondary-btn:hover {
+  transform: translateY(-1px);
+}
+
+.delete-btn,
+.receipt-remove-btn {
+  border-radius: 10px;
+  transition: transform 0.25s var(--ease), background 0.25s;
+}
+.delete-btn:hover,
+.receipt-remove-btn:hover {
+  transform: scale(1.12);
+}
+
+/* ---------- INPUTS ---------- */
+
+input,
+select,
+textarea {
+  border-radius: 12px;
+  transition: box-shadow 0.25s var(--ease), border-color 0.25s;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+  border-color: var(--accent);
+}
+
+/* ---------- REDUCED MOTION ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .scene * {
+    animation: none !important;
+  }
+}
+/* ============ FIX: sidebar text visible in light mode ============ */
+.logo-text h2 { color: var(--text); }
+.logo-text span { color: var(--muted); }
+.user-card h4 { color: var(--text); }
+.user-card span { color: var(--muted); }
+.user-card svg { color: var(--muted); }
+.nav-item { color: var(--text); }
+.notification-btn { color: var(--text); }
+
+/* ============ THEME TOGGLE BUTTON ============ */
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--glass-strong);
+  color: var(--text);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.3s var(--ease);
+}
+.theme-toggle:hover {
+  transform: rotate(18deg) scale(1.06);
+}
+
+/* ============ DARK MODE ============ */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0a0a0d;
+  --text: #f5f5f7;
+  --muted: #9a9aa3;
+  --line: rgba(255, 255, 255, 0.09);
+  --glass: rgba(28, 28, 33, 0.6);
+  --glass-strong: rgba(44, 44, 50, 0.85);
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.5), 0 12px 32px rgba(0, 0, 0, 0.4);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.4), 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+
+:root[data-theme="dark"] .scene {
+  background:
+    radial-gradient(1200px 800px at 85% -10%, #1b2a4f 0%, transparent 60%),
+    radial-gradient(900px 700px at -10% 110%, #2a1b4a 0%, transparent 55%),
+    var(--bg);
+}
+:root[data-theme="dark"] .orb { opacity: 0.35; }
+:root[data-theme="dark"] .glass-sphere {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: inset -20px -24px 60px rgba(255, 255, 255, 0.08), 0 40px 80px rgba(0, 0, 0, 0.5);
+}
+:root[data-theme="dark"] .grid-floor {
+  background-image:
+    linear-gradient(rgba(120, 170, 255, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 170, 255, 0.12) 1px, transparent 1px);
+}
+
+:root[data-theme="dark"] .sidebar { background: rgba(20, 20, 24, 0.65); }
+:root[data-theme="dark"] .topbar { background: rgba(10, 10, 13, 0.6); }
+
+:root[data-theme="dark"] .stat-card,
+:root[data-theme="dark"] .products-card,
+:root[data-theme="dark"] .products-table-card,
+:root[data-theme="dark"] .form-card,
+:root[data-theme="dark"] .info-panel,
+:root[data-theme="dark"] .receipt-upload-card,
+:root[data-theme="dark"] .receipt-review-card,
+:root[data-theme="dark"] .receipt-raw-card,
+:root[data-theme="dark"] .empty-state {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme="dark"] .nav-item.active,
+:root[data-theme="dark"] .search-box:focus-within,
+:root[data-theme="dark"] .secondary-btn,
+:root[data-theme="dark"] .receipt-secondary-btn {
+  background: var(--glass-strong);
+}
+:root[data-theme="dark"] .search-box {
+  background: rgba(255, 255, 255, 0.07);
+}
+:root[data-theme="dark"] .product-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+:root[data-theme="dark"] .product-icon,
+:root[data-theme="dark"] .table-product-icon {
+  background: linear-gradient(135deg, rgba(0, 113, 227, 0.25), rgba(142, 92, 247, 0.25));
+}
+
+:root[data-theme="dark"] .page-title,
+:root[data-theme="dark"] .dashboard-header h1,
+:root[data-theme="dark"] .products-page-header h1 {
+  background: linear-gradient(180deg, #f5f5f7 40%, #8e8e93);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+:root[data-theme="dark"] .page-content h1,
+:root[data-theme="dark"] .page-content h2,
+:root[data-theme="dark"] .page-content h3,
+:root[data-theme="dark"] .page-content h4,
+:root[data-theme="dark"] .page-content strong,
+:root[data-theme="dark"] .product-name,
+:root[data-theme="dark"] .table-product-name,
+:root[data-theme="dark"] .product-info h4 {
+  color: var(--text);
+}
+:root[data-theme="dark"] .category,
+:root[data-theme="dark"] .table-category,
+:root[data-theme="dark"] .expiry-date,
+:root[data-theme="dark"] .table-expiry-date,
+:root[data-theme="dark"] .stat-card p,
+:root[data-theme="dark"] .stat-card h2 {
+  color: var(--text);
+}
+:root[data-theme="dark"] .stat-card p,
+:root[data-theme="dark"] .category,
+:root[data-theme="dark"] .table-category,
+:root[data-theme="dark"] .expiry-date,
+:root[data-theme="dark"] .table-expiry-date {
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] textarea {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  border-color: var(--line);
+}
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder {
+  color: var(--muted);
+}
+:root[data-theme="dark"] select option {
+  background: #1c1c21;
+  color: var(--text);
+}
+/* ============ FIX: header card, page flash, dark mode ============ */
+
+/* Stop the page wrapper from ever showing a light background */
+.content-area,
+.page-transition,
+.page-content {
+  background: transparent !important;
+}
+
+/* Use a fade and slide only, so nothing flashes white */
+.page-transition {
+  animation: pageFadeIn 0.45s var(--ease) both !important;
+}
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Dashboard header card: glass in both themes */
+.dashboard-header {
+  background: var(--glass) !important;
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  color: var(--text);
+}
+:root[data-theme="dark"] .dashboard-header {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Headings inside it: solid text colour, no gradient */
+.dashboard-header h1,
+.dashboard-header h2 {
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  -webkit-text-fill-color: var(--text);
+  color: var(--text);
+}
+/* ============ FIX: receipt scanner text in dark mode ============ */
+
+:root[data-theme="dark"] .receipt-page,
+:root[data-theme="dark"] .receipt-page * {
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .receipt-page h1,
+:root[data-theme="dark"] .receipt-page h2,
+:root[data-theme="dark"] .receipt-page h3,
+:root[data-theme="dark"] .receipt-page h4,
+:root[data-theme="dark"] .receipt-page strong,
+:root[data-theme="dark"] .receipt-page label {
+  color: var(--text);
+  -webkit-text-fill-color: var(--text);
+}
+
+:root[data-theme="dark"] .receipt-page .receipt-subtitle,
+:root[data-theme="dark"] .receipt-page .receipt-hint,
+:root[data-theme="dark"] .receipt-page .receipt-disclaimer,
+:root[data-theme="dark"] .receipt-page .receipt-eyebrow,
+:root[data-theme="dark"] .receipt-page .receipt-file-label,
+:root[data-theme="dark"] .receipt-page .receipt-progress,
+:root[data-theme="dark"] .receipt-page .receipt-ai-evidence {
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .receipt-page .receipt-eyebrow {
+  color: var(--accent);
+}
+
+/* Form fields inside the receipt page */
+:root[data-theme="dark"] .receipt-page input,
+:root[data-theme="dark"] .receipt-page select,
+:root[data-theme="dark"] .receipt-page textarea {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+/* Keep the primary button's text white on its gradient */
+:root[data-theme="dark"] .receipt-page .receipt-primary-btn,
+:root[data-theme="dark"] .receipt-page .receipt-primary-btn * {
+  color: #fff;
+}
+
+/* Keep icons visible */
+:root[data-theme="dark"] .receipt-page svg {
+  color: currentColor;
+}
+/* ============ SETTINGS PAGE & CLICKABLE ACCOUNT CARD ============ */
+
+.user-card-button {
+  width: 100%;
+  border: none;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.user-card-button:hover {
+  transform: translateY(-1px);
+}
+
+.profile-avatar {
+  border: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: #fff;
+}
+
+.settings-card {
+  margin-top: 24px;
+  padding: 28px;
+}
+.settings-card h3 {
+  font-size: 18px;
+  font-weight: 650;
+  margin-bottom: 4px;
+}
+.settings-hint {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.settings-options {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+.settings-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--glass-strong);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.settings-option:hover {
+  transform: translateY(-2px);
+}
+.settings-option.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2);
+}
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+}
+.settings-row:last-child {
+  border-bottom: none;
+}
+.settings-row span {
+  color: var(--muted);
+}
+.settings-row strong {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
